@@ -9,26 +9,21 @@ add_compile_options(-Wall -g)
 set(chrony_sources client.c message.c socket.c)
 set(chrony_public_headers chrony.h)
 
-add_library(chrony_obj OBJECT ${chrony_sources})
-target_include_directories(chrony_obj PUBLIC
+add_library(chrony SHARED ${chrony_sources})
+target_include_directories(chrony PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-target_link_libraries(chrony_obj PUBLIC m)
-
-add_library(chrony SHARED $<TARGET_OBJECTS:chrony_obj>)
-target_link_libraries(chrony PRIVATE chrony_obj)
+target_link_libraries(chrony PUBLIC m)
 set_target_properties(chrony PROPERTIES
     VERSION 0.2.0
     SOVERSION 0
 )
 
-add_executable(example-reports example-reports.c)
-target_link_libraries(example-reports PRIVATE chrony_obj)
-install(TARGETS example-reports RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+add_executable(example-reports EXCLUDE_FROM_ALL example-reports.c ${chrony_sources})
+target_link_libraries(example-reports PRIVATE m)
 
-add_executable(fuzz fuzz.c)
-target_link_libraries(fuzz PRIVATE chrony)
+add_executable(fuzz EXCLUDE_FROM_ALL fuzz.c ${chrony_sources})
 
 include(GNUInstallDirs)
 
