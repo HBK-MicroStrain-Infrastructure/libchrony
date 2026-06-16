@@ -5,3 +5,7 @@
 .libs
 .vimrc
 example-reports
+fuzz
+build/
+*.so
+*.so.*
